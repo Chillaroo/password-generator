@@ -21,7 +21,7 @@ function prompts() {
     return;
   }
   length = parseFloat(length);
-  while((Number.isInteger(length)===false)||(length<8)||(length>128)){
+  while((Number.isInteger(length)===false)||(length<4)||(length>128)){
     length = prompt("ERROR: that was either not an integer or out of range. Please input an integer between 8 and 128.");
     if(!length){
       break;
@@ -47,43 +47,73 @@ function prompts() {
 
 function generateCharacterSets (constraints) {
 
-  if (constraints.special == true) {
+  if (constraints.special === true) {
     characterTypes.push(specialCharacters);
   }
-  if (constraints.upperCase == true) {
+  if (constraints.upperCase === true) {
     characterTypes.push(uppercaseLetters);
   }
-  if (constraints.lowerCase == true) {
+  if (constraints.lowerCase === true) {
     characterTypes.push(letters);
   }
-  if (constraints.numbers == true) {
+  if (constraints.numbers === true) {
     characterTypes.push(digits);
   }
 
-  if (characterTypes.length == 0){
+  if (characterTypes.length === 0){
     alert("You need to select at least one character type to generate a password. Please press OK to try again.");
     prompts();
   }
 
+  console.log(characterTypes);
   return characterTypes;
 }
 
 function generatePassword(characterTypes){
+  //Picks random elements from an array of arrays and adds them to passwordArray
   for(var i=0; i<length; i++){
     let outerIndex = Math.floor(Math.random()*characterTypes.length);
     let innerIndex = Math.floor(Math.random()*characterTypes[outerIndex].length);
     passwordArray.push(characterTypes[outerIndex][innerIndex]);
   }
+
+  //Calculatres the intersection of two arrays
+  function getArraysIntersection(a1,a2){
+    return  a1.filter(function(n) { return a2.indexOf(n) !== -1;});
+  }
+
+  //Checks if user specifications have been met and runs the function again if they have not been met
+  if((special===true) && (getArraysIntersection(passwordArray,specialCharacters)===[])){
+    console.log(passwordArray);
+    generatePassword();
+  }
+  else if((lowerCase===true) && (getArraysIntersection(passwordArray,letters)===[])){
+    console.log(passwordArray);
+    generatePassword();
+  }
+  else if((upperCase===true) && (getArraysIntersection(passwordArray, uppercaseLetters)===[])){
+    console.log(passwordArray);
+    generatePassword();
+  }
+  else if((numbers===true) && (getArraysIntersection(passwordArray,digits)===[])){
+    console.log(passwordArray);
+    generatePassword();
+  }
+  else{
+    console.log("special: " + special + "\n numbers: " + numbers + "\n uppercase: " + upperCase + "\n lowercase: " + lowerCase);
+    console.log("Intersection with special: " + getArraysIntersection(passwordArray,specialCharacters));
+    console.log("Intersection with numbers: " + getArraysIntersection(passwordArray,letters));
+    console.log("Intersection with upper: " + getArraysIntersection(passwordArray, uppercaseLetters));
+    console.log("Intersection with lower: " + getArraysIntersection(passwordArray,digits));
+  }
+
+  //Converts password to a string
   password = passwordArray.join('');
   console.log(password);
   return password;  
 }
 
 // Add event listener to generate button
-/* generateBtn.addEventListener("click", prompts); */
-/* generatePassword(generateCharacterSets(prompts())); */
-
-
 generateBtn.addEventListener("click", writePassword);
 
 //Write password to the #password input
