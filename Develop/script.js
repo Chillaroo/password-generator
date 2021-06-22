@@ -5,6 +5,7 @@ var digits = [0,1,2,3,4,5,6,7,8,9];
 var letters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
 var uppercaseLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 var length = 0;
+var startingLength = 0;
 var lowerCase = false;
 var special = false;
 var upperCase = false;
@@ -49,15 +50,23 @@ function generateCharacterSets (constraints) {
 
   if (constraints.special === true) {
     characterTypes.push(specialCharacters);
+    passwordArray.push(specialCharacters[Math.floor(Math.random()*specialCharacters.length)]);
+    startingLength++;
   }
   if (constraints.upperCase === true) {
     characterTypes.push(uppercaseLetters);
+    passwordArray.push(uppercaseLetters[Math.floor(Math.random()*uppercaseLetters.length)]);
+    startingLength++;
   }
   if (constraints.lowerCase === true) {
     characterTypes.push(letters);
+    passwordArray.push(letters[Math.floor(Math.random()*letters.length)]);
+    startingLength++;
   }
   if (constraints.numbers === true) {
     characterTypes.push(digits);
+    passwordArray.push(digits[Math.floor(Math.random()*digits.length)]);
+    startingLength++;
   }
 
   if (characterTypes.length === 0){
@@ -69,15 +78,21 @@ function generateCharacterSets (constraints) {
   return characterTypes;
 }
 
+function shuffle(array) {
+  array.sort(() => Math.random() - 0.5);
+}
+
 function generatePassword(characterTypes){
   //Picks random elements from an array of arrays and adds them to passwordArray
-  for(var i=0; i<length; i++){
+  for(var i=0; i<(length-startingLength); i++){
     let outerIndex = Math.floor(Math.random()*characterTypes.length);
     let innerIndex = Math.floor(Math.random()*characterTypes[outerIndex].length);
     passwordArray.push(characterTypes[outerIndex][innerIndex]);
   }
 
-  //Calculatres the intersection of two arrays
+  shuffle(passwordArray);
+
+/*   //Calculatres the intersection of two arrays
   function getArraysIntersection(a1,a2){
     return  a1.filter(function(n) { return a2.indexOf(n) !== -1;});
   }
@@ -105,7 +120,7 @@ function generatePassword(characterTypes){
     console.log("Intersection with numbers: " + getArraysIntersection(passwordArray,letters));
     console.log("Intersection with upper: " + getArraysIntersection(passwordArray, uppercaseLetters));
     console.log("Intersection with lower: " + getArraysIntersection(passwordArray,digits));
-  }
+  } */
 
   //Converts password to a string
   password = passwordArray.join('');
@@ -118,6 +133,10 @@ generateBtn.addEventListener("click", writePassword);
 
 //Write password to the #password input
 function writePassword() {
+  characterTypes = [];
+  passwordArray = [];
+  length = 0;
+  startingLength = 0;
   var password = generatePassword(generateCharacterSets(prompts()));
   var passwordText = document.querySelector("#password");
   passwordText.value = password;
