@@ -2,7 +2,7 @@ This is a password generator. When the you press "Generate" you will be presente
 
 If you press the "Generate" button again, then you can repeat the process to create another password.
 
-Here is a link to the deployed code: https://chillaroo.github.io/password-generator/
+Here is a link to the deployed code: https://chillaroo.github.io/password-generator/Develop/index.html
 
 Here is a screenshot of the password generator:
 ![](/screenshot.png)
