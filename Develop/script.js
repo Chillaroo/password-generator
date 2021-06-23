@@ -13,29 +13,31 @@ var numbers = false;
 var characterTypes = [];
 var passwordArray = [];
 
-
-
+//Collect user inputs and returns an object with the password constraints
 function prompts() {
-
   length = prompt("How many characters do you want in your password? \nInput an integer between 8 and 128.");
+  //Ends the function if the user presses "Cancel"
   if(!length){
     return;
   }
   length = parseFloat(length);
-  while((Number.isInteger(length)===false)||(length<4)||(length>128)){
+  //Send an error message if the user doesn't input an appropriate integer
+  while((Number.isInteger(length)===false)||(length<8)||(length>128)){
     length = prompt("ERROR: that was either not an integer or out of range. Please input an integer between 8 and 128.");
+    //End the function if the user presses "Cancel"
     if(!length){
-      break;
+      return;
     }
     else{
       length = parseFloat(length);
     }
   }
-  special =  confirm("Do you want any special characters? Press 'OK' for yes 'Cancel' for No.");
-  upperCase = confirm("Do you want any upper case letters? Press 'OK' for yes 'Cancel' for No.");
-  lowerCase = confirm("Do you want any lower case letters? Press 'OK' for yes 'Cancel' for No.");
-  numbers = confirm("Do you want any numbers? Press 'OK' for yes 'Cancel' for No.");
-
+  //Collect user inputs
+  special =  confirm("Do you want any special characters? \nPress 'OK' for yes 'Cancel' for No.");
+  upperCase = confirm("Do you want any upper case letters? \nPress 'OK' for yes 'Cancel' for No.");
+  lowerCase = confirm("Do you want any lower case letters? \nPress 'OK' for yes 'Cancel' for No.");
+  numbers = confirm("Do you want any numbers? \nPress 'OK' for yes 'Cancel' for No.");
+  //Return an object containing user inputs
   return {
     length: length,
     special: special,
@@ -46,8 +48,8 @@ function prompts() {
 
 }
 
+//Create an array of user-specified character types and add one of each user-specified character type to the password array
 function generateCharacterSets (constraints) {
-
   if (constraints.special === true) {
     characterTypes.push(specialCharacters);
     passwordArray.push(specialCharacters[Math.floor(Math.random()*specialCharacters.length)]);
@@ -68,77 +70,56 @@ function generateCharacterSets (constraints) {
     passwordArray.push(digits[Math.floor(Math.random()*digits.length)]);
     startingLength++;
   }
-
-  if (characterTypes.length === 0){
-    alert("You need to select at least one character type to generate a password. Please press OK to try again.");
-    prompts();
-  }
-
-  console.log(characterTypes);
   return characterTypes;
 }
 
+//Shuffle an array
 function shuffle(array) {
   array.sort(() => Math.random() - 0.5);
 }
 
+//Select random elements from the array of user-specified character types and add them to the password array
 function generatePassword(characterTypes){
-  //Picks random elements from an array of arrays and adds them to passwordArray
   for(var i=0; i<(length-startingLength); i++){
     let outerIndex = Math.floor(Math.random()*characterTypes.length);
     let innerIndex = Math.floor(Math.random()*characterTypes[outerIndex].length);
     passwordArray.push(characterTypes[outerIndex][innerIndex]);
   }
-
+  //Shuffle the password array
   shuffle(passwordArray);
-
-/*   //Calculatres the intersection of two arrays
-  function getArraysIntersection(a1,a2){
-    return  a1.filter(function(n) { return a2.indexOf(n) !== -1;});
-  }
-
-  //Checks if user specifications have been met and runs the function again if they have not been met
-  if((special===true) && (getArraysIntersection(passwordArray,specialCharacters)===[])){
-    console.log(passwordArray);
-    generatePassword();
-  }
-  else if((lowerCase===true) && (getArraysIntersection(passwordArray,letters)===[])){
-    console.log(passwordArray);
-    generatePassword();
-  }
-  else if((upperCase===true) && (getArraysIntersection(passwordArray, uppercaseLetters)===[])){
-    console.log(passwordArray);
-    generatePassword();
-  }
-  else if((numbers===true) && (getArraysIntersection(passwordArray,digits)===[])){
-    console.log(passwordArray);
-    generatePassword();
-  }
-  else{
-    console.log("special: " + special + "\n numbers: " + numbers + "\n uppercase: " + upperCase + "\n lowercase: " + lowerCase);
-    console.log("Intersection with special: " + getArraysIntersection(passwordArray,specialCharacters));
-    console.log("Intersection with numbers: " + getArraysIntersection(passwordArray,letters));
-    console.log("Intersection with upper: " + getArraysIntersection(passwordArray, uppercaseLetters));
-    console.log("Intersection with lower: " + getArraysIntersection(passwordArray,digits));
-  } */
-
-  //Converts password to a string
+  //Converts password array to a string
   password = passwordArray.join('');
   console.log(password);
+  //Return the password as a string
   return password;  
 }
 
-// Add event listener to generate button
-generateBtn.addEventListener("click", writePassword);
-
 //Write password to the #password input
 function writePassword() {
+  //Reset arrays and lengths
   characterTypes = [];
   passwordArray = [];
   length = 0;
   startingLength = 0;
-  var password = generatePassword(generateCharacterSets(prompts()));
+  //Store the user inputs
+  let userInputs = prompts();
+  //Send an error message if the user inputs aren't valid and prompt the user to try again or cancel
+  if(!userInputs){
+    return;
+  } 
+  else if (!userInputs.special && !userInputs.upperCase && !userInputs.lowerCase && !userInputs.numbers){
+    var tryAgain = confirm("You need to select at least one character type to generate a password. \nPlease press 'OK' to try again and 'Cancel' to quit.");
+    if(tryAgain){
+      writePassword();
+    }
+    return;
+  }
+  //Collect the inputs, create the password, and store the password as a string
+  var password = generatePassword(generateCharacterSets(userInputs));
+  //Display the password on the screen
   var passwordText = document.querySelector("#password");
   passwordText.value = password;
 }
-  
+
+//Call the writePassword function when the user clicks the "Generate" button
+generateBtn.addEventListener("click", writePassword);
